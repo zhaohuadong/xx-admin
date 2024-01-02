@@ -1,0 +1,132 @@
+// 列表项
+export const columns = [
+  {{#if selection}}
+  { type: 'selection' },
+  {{/if}}
+  {
+    label: '只在列表展示',
+    prop: 'item1',
+    hideInSearch: true,
+  },
+  {
+    label: '只在搜索展示',
+    prop: 'item2',
+    hideInTable: true,
+  },
+  {
+    label: '普通列表项',
+    prop: 'item3',
+  },
+  {
+    label: '枚举值列表项',
+    prop: 'item4',
+    type: 'select',
+    enum: [
+      {
+        label: '全部',
+        value: '',
+      },
+      {
+        label: '选项1',
+        value: 1,
+      },
+      {
+        label: '选项2',
+        value: 2,
+      },
+    ],
+  },
+  {
+    label: 'switch列表项',
+    prop: 'item5',
+    type: 'switch',
+    enum: [
+      {
+        value: '0',
+        label: '开启',
+      },
+      {
+        value: '1',
+        label: '关闭',
+      },
+    ],
+    api: editStatusApi,
+  },
+  {
+    label: '日期范围搜索项',
+    prop: 'item6',
+    type: 'daterange',
+  },
+  {{#if action}}
+  { prop: 'action', label: '操作', fixed: 'right' },
+  {{/if}}
+]
+{{#if addOrEdit}}
+// 新增或编辑相关
+// 表单值
+export const formData = () => ({
+  {{#if input}}
+  input: '',
+  {{/if}}
+  {{#if inputNumber}}
+  inputNumber: '',
+  {{/if}}
+  {{#if select}}
+  select: '',
+  {{/if}}
+  {{#if radio}}
+  radio: '1',
+  {{/if}}
+  {{#if textarea}}
+  textarea: '',
+  {{/if}}
+})
+// 校验规则
+export const formRule = {
+  {{#if input}}
+  input: [
+    {
+      required: true,
+      message: '请输入文字',
+      trigger: 'blur',
+    },
+  ],
+  {{/if}}
+  {{#if inputNumber}}
+  inputNumber: [
+    {
+      required: true,
+      message: '请输入数字',
+      trigger: 'blur',
+    },
+  ],
+  {{/if}}
+  {{#if select}}
+  select: [
+    {
+      required: true,
+      message: '请选择',
+      trigger: 'change',
+    },
+  ],
+  {{/if}}
+  {{#if radio}}
+  radio: [
+    {
+      required: true,
+      message: '请选择',
+      trigger: 'change',
+    },
+  ],
+  {{/if}}
+  {{#if textarea}}
+  textarea: [
+    {
+      required: true,
+      message: '请输入',
+      trigger: 'blur',
+    },
+  ],
+  {{/if}}
+}
+{{/if}}

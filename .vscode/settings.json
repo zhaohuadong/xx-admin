@@ -1,0 +1,17 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode", // 默认使用prettier格式化
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.eol": "\n",
+  "editor.tabSize": 2,
+  "prettier.enable": true, // 启用prettier
+  "eslint.alwaysShowStatus": true, // 始终显示eslint提示
+  "editor.formatOnSave": true, // 保存时格式化
+  // 保存时候按eslint规则进行修复
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.format.enable": true, // 启用ESLint作为已验证文件的格式化程序
+  "vetur.validation.script": false // 禁用vetur的校验
+}

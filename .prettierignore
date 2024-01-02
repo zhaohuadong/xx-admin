@@ -1,0 +1,6 @@
+/dist/*
+/node_modules/*
+/static/*
+/public/*
+/*-lock.*
+.DS_Store

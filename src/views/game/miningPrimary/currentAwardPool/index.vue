@@ -1,0 +1,105 @@
+<template>
+  <div class="app-container">
+    <el-card>
+      <el-tabs v-model="initParam.type" @tab-click="handleClick">
+        <el-tab-pane v-for="(item, index) in poolList" :key="index" :label="item.label" :name="item.value" />
+      </el-tabs>
+      <div class="flex gap-6 flex-wrap flex-shrink-0 mb-4">
+        <el-card shadow="always">{{ activePool }}</el-card>
+        <el-card shadow="always">剩余礼物数量： {{ giftSum }}</el-card>
+        <el-card shadow="always">剩余礼物总金额： {{ total }}</el-card>
+        <!-- <el-card shadow="always">今日消耗当前奖池数： hhewhwhtrehrwh</el-card> -->
+      </div>
+      <MyProTable
+        ref="myProTableRef"
+        :columns="columns"
+        :requestApi="getListApi"
+        :deleteApi="deleteApi"
+        :deleteBatchApi="batchDeleteApi"
+        :otherHeight="140"
+        :initParam="initParam"
+        :dataCallback="dataCallback"
+      >
+        <!-- 表格 header 按钮 -->
+        <template #tableHeader>
+          <el-button type="primary" @click="setReplaceDialogPage()">替换新奖池</el-button>
+          <el-button type="primary" @click="setAddAndEditPage()">新增</el-button>
+          <el-button type="primary" plain @click="editBatch">一键修改</el-button>
+        </template>
+        <!-- 表格操作 -->
+        <template #action="{ row }">
+          <el-button type="primary" link @click="setAddAndEditPage(row)">编辑</el-button>
+        </template>
+      </MyProTable>
+    </el-card>
+    <!-- 新增和编辑弹窗 -->
+    <AddOrEdit ref="addOrEdit" :type="initParam.type" @queryTable="resetList" />
+    <!-- 替换新奖池-->
+    <ReplaceDialog ref="replaceDialog" :giftSum="giftSum" :total="total" @queryTable="resetList" />
+    <!-- 一键修改-->
+    <OneClickEditing ref="oneClickEditing" @queryTable="resetList" />
+  </div>
+</template>
+
+<script setup name="CurrentAwardPool">
+import { columns, poolList } from './constants.js'
+import { getListApi, deleteApi, batchDeleteApi, getListStatApi } from '@/api/game/currentAwardPool.js'
+import { reactive, ref } from 'vue'
+import AddOrEdit from './components/addOrEdit.vue'
+import ReplaceDialog from './components/replaceDialog.vue'
+import OneClickEditing from './components/OneClickEditing'
+const initParam = reactive({
+  type: 3,
+})
+// tab栏切换
+const activePool = ref('初级单连奖池')
+const handleClick = (e) => {
+  initParam.type = e.props.name
+  activePool.value = e.props.label
+  gitStatList(e.props.name)
+  myProTableRef.value.changeCurrent(1)
+}
+
+const myProTableRef = ref(null)
+
+// 此处可以自定义表格返回值
+const dataCallback = (result) => {
+  result.rows = result.data.map((item) => {
+    item.status = `${item.status}`
+    return item
+  })
+  return result
+}
+const resetList = () => {
+  myProTableRef.value.reset()
+}
+
+// 获取奖池列表数据
+const giftSum = ref(0)
+const total = ref(0)
+const gitStatList = async (params) => {
+  const { data } = await getListStatApi({ type: params })
+  giftSum.value = data.giftNumber
+  total.value = data.total
+}
+gitStatList(initParam.type)
+// 编辑弹窗
+const addOrEdit = ref()
+const setAddAndEditPage = (params) => {
+  addOrEdit.value.showDialog(params)
+}
+
+// 替换新奖池弹窗
+const replaceDialog = ref()
+const setReplaceDialogPage = (params) => {
+  replaceDialog.value.showDialog(initParam.type)
+}
+
+// 一键修改弹窗
+const oneClickEditing = ref()
+function editBatch() {
+  oneClickEditing.value.showDialog(initParam.type)
+}
+</script>
+
+<style scoped></style>

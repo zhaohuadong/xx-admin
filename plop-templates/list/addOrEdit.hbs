@@ -1,0 +1,101 @@
+<template>
+  <MyDialog :model-value="visible" :title="titleName" @submit="submit" @toggle="toggle">
+    <el-form :model="form" :rules="formRule" ref="formRef" label-width="auto">
+      {{#if input}}
+      <!-- input -->
+      <el-form-item label="文字" prop="input">
+        <el-input v-model="form.input" placeholder="请输入文字" />
+      </el-form-item>
+      {{/if}}
+      {{#if inputNumber}}
+      <!-- inputNumber -->
+      <el-form-item label="数字" prop="numberInput">
+        <el-input-number v-model="form.numberInput" :min="1" placeholder="请输入数字" />
+      </el-form-item>
+      {{/if}}
+      {{#if select}}
+      <!-- select -->
+      <el-form-item label="下拉选择" prop="select">
+        <el-select v-model="form.select" placeholder="请选择">
+          <el-option v-for="item in ITEM_LIST" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+      </el-form-item>
+      {{/if}}
+      {{#if radio}}
+      <!-- radio -->
+      <el-form-item label="单选" prop="radio">
+        <el-radio-group v-model="form.radio" placeholder="请选择">
+          <el-radio label="1">启用</el-radio>
+          <el-radio label="0">禁用</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      {{/if}}
+      {{#if textarea}}
+      <!-- textarea -->
+      <el-form-item label="多行文本" prop="textarea">
+        <el-input v-model="form.textarea" show-word-limit maxlength="500" type="textarea" placeholder="请输入" />
+      </el-form-item>
+      {{/if}}
+      {{#if ImageUpload}}
+      <!-- img -->
+      <el-form-item label="上传图片" prop="img">
+        <ImageUpload v-model="form.img" />
+      </el-form-item>
+      {{/if}}
+      {{#if FileUpload}}
+      <!-- file -->
+      <el-form-item label="上传文件" prop="file">
+        <FileUpload v-model="form.file" />
+      </el-form-item>
+      {{/if}}
+    </el-form>
+  </MyDialog>
+</template>
+<script setup>
+// 修改对应api路径
+import { editApi, addApi } from '@/api/system/param.js'
+import { useToggle } from '@vueuse/core'
+import { formData, formRule } from '../constants'
+const { proxy } = getCurrentInstance()
+const emits = defineEmits(['queryTable'])
+
+const [visible, toggle] = useToggle()
+const formRef = ref()
+const form = reactive(formData())
+
+// 判断是新增或编辑
+let isEdit = false
+const titleName = ref('')
+
+// 显示弹窗
+const showDialog = (params = null) => {
+  proxy.resetForm(formRef.value)
+  isEdit = !!params
+  titleName.value = isEdit ? '编辑' : '新增'
+  // 初始化表单值
+  Object.assign(form, params || formData())
+  visible.value = true
+}
+// 提交表单
+const submit = () => {
+  if (!formRef.value) return
+  formRef.value.validate(async (valid) => {
+    if (valid) {
+      if (isEdit) {
+        await editApi(form)
+        proxy.$modal.msgSuccess(`编辑成功`)
+      } else {
+        await addApi(form)
+        proxy.$modal.msgSuccess(`新增成功`)
+      }
+      emits('queryTable')
+      visible.value = false
+    } else {
+      console.log('error submit')
+      return false
+    }
+  })
+}
+
+defineExpose({ showDialog })
+</script>

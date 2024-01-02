@@ -1,0 +1,60 @@
+<template>
+  <div class="app-container">
+    <el-card>
+      <el-tabs v-model="initParam.type" lazy="true" @tab-change="changeTab">
+        <el-tab-pane label="官方类别" name="1" />
+        <el-tab-pane label="个人类别" name="2" />
+      </el-tabs>
+      <MyProTable
+        ref="myProTableRef"
+        :columns="columns"
+        :requestApi="getListApi"
+        :deleteApi="deleteApi"
+        otherHeight="55"
+        :initParam="initParam"
+        selectionKey="id"
+      >
+        <!-- :deleteBatchApi="batchDeleteApi" -->
+        <!-- 表格 header 按钮 -->
+        <template #tableHeader>
+          <el-button link type="primary" @click="setAddAndEditPage(undefined, checkTabValue)">新增</el-button>
+        </template>
+        <!-- 表格操作 -->
+        <template #action="{ row }">
+          <el-button link type="primary" @click="setAddAndEditPage(row, checkTabValue)">编辑</el-button>
+        </template>
+        <!-- <template #state="{row}">
+         {{ row.state === 1 ? '显示' : '隐藏' }}
+        </template> -->
+      </MyProTable>
+    </el-card>
+    <!--新增和编辑弹窗-->
+    <AddAndEdit ref="addAndEdit" @queryTable="resetList" />
+  </div>
+</template>
+<script setup name="CategoryManage">
+import AddAndEdit from './components/addAndEdit.vue'
+import { columns } from './constants'
+import { getListApi, deleteApi } from '@/api/room/type.js'
+
+const myProTableRef = ref(null)
+const checkTabValue = ref('1')
+const initParam = reactive({
+  type: '1',
+})
+// tab栏切换
+const changeTab = (tab) => {
+  initParam.type = tab
+  checkTabValue.value = tab
+  myProTableRef.value.changeCurrent(1)
+}
+
+const resetList = () => {
+  myProTableRef.value.reset()
+}
+// 新增和编辑弹窗
+const addAndEdit = ref()
+const setAddAndEditPage = (params, tabVal) => {
+  addAndEdit.value.showDialog(params, tabVal)
+}
+</script>

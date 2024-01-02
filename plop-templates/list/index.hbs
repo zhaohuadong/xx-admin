@@ -1,0 +1,103 @@
+<template>
+  <div class="app-container">
+    <MyProTable
+      ref="myProTableRef"
+      :columns="columns"
+      {{#if getListApi}}
+      :requestApi="getListApi"
+      {{/if}}
+      {{#if getList}}
+      :requestApi="getList"
+      {{/if}}
+      {{#if deleteApi}}
+      :deleteApi="deleteApi"
+      {{/if}}
+      {{#if deleteBatchApi}}
+      :deleteBatchApi="batchDeleteApi"
+      {{/if}}
+      {{#if initParam}}
+      :initParam="initParam"
+      {{/if}}
+      {{#if dataCallback}}
+      :dataCallback="dataCallback"
+      {{/if}}
+      {{#if otherHeight}}
+      otherHeight="55"
+      {{/if}}
+      {{#if noSelection}}
+      :selection="false"
+      {{/if}}
+    >
+      {{#if tableHeader}}
+      <!-- 表格 header 按钮 -->
+      <template #tableHeader>
+        {{#if addOrEdit}}
+        <el-button type="primary" @click="showAddOrEditPage()">新增</el-button>
+        {{/if}}
+      </template>
+      {{/if}}
+      {{#if action}}
+      <!-- 表格操作 -->
+      <template #action="{ row }">
+        {{#if addOrEdit}}
+        <el-button type="primary" link @click="showAddOrEditPage(row)">编辑</el-button>
+        {{/if}}
+      </template>
+      {{/if}}
+    </MyProTable>
+    {{#if addOrEdit}}
+    <!-- 新增和编辑弹窗 -->
+    <AddOrEdit ref="addOrEditRef" @queryTable="resetList" />
+    {{/if}}
+  </div>
+</template>
+
+<script setup name="{{pascalCase name}}">
+{{#if addOrEdit}}
+import AddOrEdit from './components/addOrEdit.vue'
+{{/if}}
+import { columns } from './constants'
+// 修改对应api路径
+import { getListApi, deleteApi, batchDeleteApi } from '@/api/system/param.js'
+
+const myProTableRef = ref(null)
+{{#if initParam}}
+// 此处可以放初始请求参数
+const initParam = reactive({
+  appType: '1',
+})
+{{/if}}
+{{#if getList}}
+// 此处可以自定义表格请求值
+const getList = (params) => {
+  const newParams = JSON.parse(JSON.stringify(params))
+  newParams.startTime = newParams.date?.[0] ?? ''
+  newParams.endTime = newParams.date?.[1] ?? ''
+  delete newParams.date
+  return getListApi(newParams)
+}
+{{/if}}
+{{#if dataCallback}}
+// 此处可以自定义表格返回值
+const dataCallback = (result) => {
+  result.rows = result.rows.map((item) => {
+    item.status = `${item.status}`
+    return item
+  })
+  return result
+}
+{{/if}}
+{{#if addOrEdit}}
+// 新增或编辑弹窗
+const addOrEditRef = ref()
+const showAddOrEditPage = (params) => {
+  addOrEditRef.value.showDialog(params)
+}
+// 操作成功后重置表格
+const resetList = () => {
+  myProTableRef.value.reset()
+}
+{{/if}}
+</script>
+
+<style lang="scss" scoped></style>

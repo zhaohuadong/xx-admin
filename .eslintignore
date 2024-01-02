@@ -1,0 +1,8 @@
+/dist/*
+/node_modules/*
+/static/*
+/public/*
+/*-lock.*
+.DS_Store
+components.d.ts
+auto-imports.d.ts
